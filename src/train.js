@@ -10,7 +10,7 @@ const imageWidth = 1024
 const imageHeight = 768
 const epochBatchSize = 20
 const batchSize = 5
-const epochCount = 5
+const epochCount = 20
 const trainingGroups = 20
 
 function createModel(imageWidth, imageHeight) {
@@ -43,7 +43,7 @@ async function restoreModel(path) {
 } 
 
 async function saveModel(model) {
-    return await model.save('file:///tmp/grayscale-model')
+    return await model.save('file:///tmp/graycolor-model')
 }
 
 
