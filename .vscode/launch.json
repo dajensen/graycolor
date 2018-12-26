@@ -17,6 +17,13 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Initial Train",
+            "program": "${workspaceRoot}/src/train.js",
+            "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Makegrey",
             "program": "${workspaceRoot}/src/makegray.js",
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
