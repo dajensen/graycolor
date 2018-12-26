@@ -10,7 +10,7 @@
             "name": "Train",
             "program": "${workspaceRoot}/src/train.js",
             "args": [
-                "--model=/tmp/grayscale-model/"
+                "--model=/tmp/graycolor-model/"
             ],
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
         },
