@@ -8,6 +8,11 @@ Grayscale to color conversion for pc screenshots
         "@tensorflow/tfjs-node"
     to be this instead:
         "@tensorflow/tfjs-node-gpu"
+        
+    Then also go to src/train.js and change this import:
+        import '@tensorflow/tfjs-node';
+    to be 
+        import '@tensorflow/tfjs-node-gpu';
     
 2. Run "npm install" to get all of your dependencies downloaded and installed in the node-modules directory
 
