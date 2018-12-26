@@ -1,0 +1,7 @@
+This directory must exist and must contain a set of colored screenshots from PCs.
+You can get a sample set here: https://s3.amazonaws.com/grayscale-data/screenshots.zip
+
+Download that file and uncompress its contents into this directory.
+When that process is done, this directory should contain no subdirectories, only .bmp files.
+
+All of the files should have the same dimensions and should be 24bpp color images.
