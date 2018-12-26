@@ -1,6 +1,9 @@
 This directory must exist and must contain a set of colored screenshots from PCs.
 You can get a sample set here: https://s3.amazonaws.com/grayscale-data/screenshots.zip
-
+    On an AWS instance of the Ubuntu Deep Learning AMI, this set of command works well:
+        curl https://s3.amazonaws.com/grayscale-data/screenshots.zip --output screenshots.zip
+        unzip screenshots.zip
+    
 Download that file and uncompress its contents into this directory.
 When that process is done, this directory should contain no subdirectories, only .bmp files.
 
