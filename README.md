@@ -2,7 +2,7 @@
 Grayscale to color conversion for pc screenshots
 
 
-##Installing and Running 
+## Installing and Running 
 
 1. If you're using a GPU, then first go to package.json and update this:
         "@tensorflow/tfjs-node"
