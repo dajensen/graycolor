@@ -8,10 +8,10 @@ export function makeCleanDir(dir) {
 }
 
 export function getBmpFileList(dir) {
-
+    const search = ".bmp"
     let files = fs.readdirSync(dir)
 
     return files.filter((item)=>{
-        return item !== ".DS_Store"
+        return item.substring(item.length - search.length, item.length) === ".bmp"
     })
 }
