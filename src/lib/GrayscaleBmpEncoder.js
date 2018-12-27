@@ -23,8 +23,8 @@ function BmpEncoder(imgData){
         throw new Error("BmpEncoder only supports single plane bitmaps")
 
     // Only 8 and 24 bpp formats
-    if(imgData.bpp != 24 && imgData.bpp != 8)
-        throw new Error("BmpEncoder only supports 8 and 24 bpp bitmaps")
+    if(imgData.bpp != 32 && imgData.bpp != 24 && imgData.bpp != 8)
+        throw new Error("BmpEncoder only supports 8, 24, and 32 bpp bitmaps")
 
     // 8bpp formats require a palette
     if(imgData.bpp == 8 && !imgData.palette)
@@ -41,7 +41,7 @@ function BmpEncoder(imgData){
 
     this.data = [];
         
-    this.bmiColorsSize = (imgData.bpp == 24 ? 0 : 256 * 4)      // 256 RGBQUAD elements for the palette in an 8bpp image
+    this.bmiColorsSize = (imgData.bpp == 8 ? 256 * 4 : 0)      // 256 RGBQUAD elements for the palette in an 8bpp image
 
 	/******************header***********************/
 	this.flag = "BM";

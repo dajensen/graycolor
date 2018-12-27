@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs'; 
 import {makeCleanDir, getBmpFileList} from './FileSystemUtils'
-import {loadBmp, saveBmp} from './BmpFileUtils'
-import {abgrToGrayscale} from './ColorSpaceUtils'
+import {loadBmp, saveGrayscaleBmp} from './BmpFileUtils'
+import {abgrToYCbCr} from './ColorSpaceUtils'
 const path = require('path');
 
 
@@ -42,15 +42,15 @@ function reservoirSample(src, destLen) {
 }
 
 export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight) {
-    let colorValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
     let grayValues = new Float32Array(batchSize * bmpWidth * bmpHeight)
+    let colorValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 2)
 
     let colorIdx = 0
     let grayIdx = 0
 
     let paths = reservoirSample(fileList, batchSize)
 
-    paths.map((file)=>{
+    paths.map((file, bmpIdx)=>{
         // Read the rgb data from the file
         let {width: thisWidth, height: thisHeight, data: bmpData} = loadBmp(path.join(srcDir, file))
         if(thisWidth != bmpWidth || thisHeight != bmpHeight) {
@@ -58,23 +58,13 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
         }
 
         // Convert to grayscale
-        let grayBuffer = abgrToGrayscale(bmpData, bmpWidth, bmpHeight)
-
-        for(let i = 0; i < bmpWidth * bmpHeight * 3; i++) {
-            colorValues[colorIdx++] = 1.0 * bmpData[i] / 255
-        }
-//        colorTensors.push(tf.tensor3d(colorFloats, [bmpHeight, bmpWidth, 3]))
-
-        // Convert to floats
-        for(let i = 0; i < bmpWidth * bmpHeight; i++) {
-            grayValues[grayIdx++] = 1.0 * grayBuffer[i] / 255
-        }
-//        grayTensors.push(tf.tensor3d(grayFloats, [bmpHeight, bmpWidth, 1]))
+        abgrToYCbCr(bmpData, bmpWidth, bmpHeight, 
+            grayValues, bmpIdx * bmpWidth * bmpHeight, 
+            colorValues, 2 * bmpIdx * bmpWidth * bmpHeight, 255)
     })
     return {
         names: paths, 
-        color: tf.tensor4d(colorValues, [batchSize, bmpHeight, bmpWidth, 3]), 
-        gray: tf.tensor(grayValues, [batchSize, bmpHeight, bmpWidth, 1])
+        color: tf.tensor4d(colorValues, [batchSize, bmpHeight, bmpWidth, 2]), 
+        gray: tf.tensor4d(grayValues, [batchSize, bmpHeight, bmpWidth, 1])
     }
 }
-

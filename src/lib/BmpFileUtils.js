@@ -20,10 +20,19 @@ export function loadBmp(filename) {
     return {width: bmpData.width, height: bmpData.height, data: bmpData.data}
 }
 
-export function saveBmp(filename, width, height, data) {
+export function saveGrayscaleBmp(filename, width, height, data) {
 
 
     var newDataBuffer = encode({width: width, height: height, data: data, planes: 1, bpp: 8, palette: grayscalePalette()})
+
+    fs.writeFileSync(filename, newDataBuffer.data)
+}
+
+export function saveColorBmp(filename, width, height, data) {
+
+    // THIS IS A LIE!
+    // The bitmap encoder is wrong.  We say 24bpp, but actually it's taking the data in 32bpp format.  EVIL!  FIX!
+    var newDataBuffer = encode({width: width, height: height, data: data, planes: 1, bpp: 24})
 
     fs.writeFileSync(filename, newDataBuffer.data)
 }
