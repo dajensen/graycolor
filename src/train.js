@@ -8,7 +8,7 @@ var argv = require('minimist')(process.argv.slice(2));
 
 // Only for predicting.  This will be extracted later.
 import {loadBmp, saveColorBmp} from './lib/BmpFileUtils'
-import {abgrToYCbCr, YCbCrToAbgr} from './lib/ColorSpaceUtils'
+import {bmpToWorkingColorspace, bmpFromWorkingColorspace} from './lib/ColorSpaceUtils'
 
 
 const imageWidth = 1024
@@ -25,9 +25,11 @@ function createModel(imageWidth, imageHeight) {
 
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
 //    model.add(tf.layers.conv2d({filters: 1, kernelSize: 16, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 4, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 8, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 4, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.dense({activation: 'relu', units: 4}))
+    model.add(tf.layers.dense({activation: 'relu', units: 4}))
+    model.add(tf.layers.dense({activation: 'relu', units: 2}))
     model.add(tf.layers.dense({activation: 'tanh', units: 2}))
     model.add(tf.layers.dense({activation: 'tanh', units: 2}))
 
@@ -53,35 +55,26 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     let {width: thisWidth, height: thisHeight, data: bmpData} = loadBmp(path.join(colordir, filename))
 
     // Convert to grayscale
-    abgrToYCbCr(bmpData, bmpWidth, bmpHeight, grayValues, 0, colorValues, 0, 255)
+    bmpToWorkingColorspace(bmpData, bmpWidth, bmpHeight, grayValues, 0, colorValues, 0, 255)
         
     let grayTensor = tf.tensor4d(grayValues, [1, bmpHeight, bmpWidth, 1])
     let predictedTensor = model.predict(grayTensor, {batchSize: 1})
 
     let rsp = predictedTensor.dataSync()
-    console.log(rsp)
-
-    console.log(grayValues)
-    console.log(colorValues)
-
 /*
     // This is a test that cuts out all of the inference, to see whether the bitmap save/restore code is correct.
-    YCbCrToAbgr(newBmpData, bmpWidth, bmpHeight, grayValues, colorValues, 255)
+    bmpFromWorkingColorspace(newBmpData, bmpWidth, bmpHeight, grayValues, colorValues, 255)
     for(let i = 0; i < 12; i++) {
         console.log("orig: " + bmpData[i], " new: " + newBmpData[i])
     }
-    saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
 */
-
-    YCbCrToAbgr(newBmpData, bmpWidth, bmpHeight, grayValues, rsp, 255)
-    for(let i = 0; i < 32; i++) {
-        console.log("orig: " + bmpData[i], " new: " + newBmpData[i])
-    }
+    bmpFromWorkingColorspace(newBmpData, bmpWidth, bmpHeight, grayValues, rsp, 255)
 
     saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
 }
 
 async function testBatch(model, colordir, testFileList, groupNum) {
+    console.dir(testFileList)
     let batch = getRandomBatch(colordir, testFileList, testBatchSize, imageWidth, imageHeight)
     console.log("Testing Group " + groupNum)
     await model.evaluate(batch.gray, batch.color, {batchSize: testBatchSize, epochs: 1})
@@ -117,7 +110,7 @@ async function doMain(args) {
     else {
         model = createModel()
     }
-    model.compile({optimizer: 'sgd', loss: 'meanSquaredError', lr:0.1})
+    model.compile({optimizer: 'adam', loss: 'meanSquaredError', lr:0.3})
     model.summary();
 
     makeCleanDir(bmpdir.Train)

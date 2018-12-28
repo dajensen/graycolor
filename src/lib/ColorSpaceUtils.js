@@ -1,4 +1,5 @@
 import { divStrict } from "@tensorflow/tfjs";
+var cs = require("color-space");
 
 
 // This (including the constants) is the luminance calculation for the YCrCb colorspace 
@@ -23,25 +24,9 @@ function convertFromYCbCr(y, cb, cr) {
     return {r, g, b}
 }
 
-export function abgrToGrayscale(src, width, height) {
-    let srcidx = 0
-    let dstidx = 0
-    let dst = Buffer.alloc(src.length / 4)  // one byte per pixel in grayscale
-
-    while(srcidx < width * height * 4) {
-        // Invert the order of r,g,b
-        // and throw away the alpha channel
-        dst[dstidx] = luminance(src[srcidx + 3], src[srcidx + 2], src[srcidx + 1])
-
-        srcidx += 4
-        dstidx ++
-    }
-    return dst
-}
-
 // src is in abgr format - the rax pixel data from a 32- or 24-bpp bitmap as decoded by our bitap reader.
 // The "divisor" parameter lets the output be scaled to the appropriate range.  In this case divisor should be 255 to put the result in the range 0..1
-export function abgrToYCbCr(src, width, height, yBuffer, yPos, colorBuffer, colorPos, scaleFactor) {
+export function bmpToWorkingColorspace(src, width, height, yBuffer, yPos, colorBuffer, colorPos, scaleFactor) {
     let srcidx = 0
     let CbPos = colorPos
     let CrPos = colorPos + width * height
@@ -52,36 +37,36 @@ export function abgrToYCbCr(src, width, height, yBuffer, yPos, colorBuffer, colo
         let b = src[srcidx + 1]
         // let a = src[srcidx]
 
-        let {Y, Cb, Cr} = convertToYCbCr(r, g, b)
-
+        let hsl = cs.rgb.hsl([r, g, b])
+/*
         // Check the math
-        let tst = convertFromYCbCr(Y, Cb, Cr)
-        let diff = {r: r - Math.floor(tst.r + 0.1), g: g - Math.floor(tst.g + 0.1), b: b - Math.floor(tst.b + 0.1)}
+        let tst = cs.hsl.rgb([hsl[0], hsl[1], hsl[2]])        
+        let diff = {r: r - Math.floor(tst[0] + 0.1), g: g - Math.floor(tst[1] + 0.1), b: b - Math.floor(tst[2] + 0.1)}
         if(diff.r != 0 || diff.g != 0 || diff.b != 0)
             console.log("r: " + diff.r, " g: " + diff.g + " b: " + diff.b)
-
-        yBuffer[yPos++] = Y / scaleFactor
-        colorBuffer[CbPos++] = Cb / scaleFactor
-        colorBuffer[CrPos++] = Cr / scaleFactor
+*/
+        yBuffer[yPos++] = hsl[2] / scaleFactor
+        colorBuffer[CbPos++] = hsl[0] / scaleFactor
+        colorBuffer[CrPos++] = hsl[1] / scaleFactor
         srcidx += 4
     }
 }
 
-export function YCbCrToAbgr(dst, width, height, yBuffer, colorBuffer, scaleFactor) {
+export function bmpFromWorkingColorspace(dst, width, height, yBuffer, colorBuffer, scaleFactor) {
     let srcidx = 0
     let dstidx = 0
 
     while(srcidx < width * height) {
-        let y = yBuffer[srcidx] * scaleFactor
-        let cb = colorBuffer[srcidx] * scaleFactor
-        let cr = colorBuffer[srcidx + width * height] * scaleFactor
+        let l = yBuffer[srcidx] * scaleFactor
+        let h = colorBuffer[srcidx] * scaleFactor
+        let s = colorBuffer[srcidx + width * height] * scaleFactor
 
-        let {r, g, b} = convertFromYCbCr(y, cb, cr)
+        let rgb = cs.hsl.rgb([h, s, l])
 
         dst[dstidx] = 0
-        dst[dstidx + 1] = b
-        dst[dstidx + 2] = g
-        dst[dstidx + 3] = r
+        dst[dstidx + 1] = rgb[2]
+        dst[dstidx + 2] = rgb[1]
+        dst[dstidx + 3] = rgb[0]
         dstidx += 4
         srcidx++
     }

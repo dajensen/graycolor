@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs'; 
 import {makeCleanDir, getBmpFileList} from './FileSystemUtils'
 import {loadBmp, saveGrayscaleBmp} from './BmpFileUtils'
-import {abgrToYCbCr} from './ColorSpaceUtils'
+import {bmpToWorkingColorspace} from './ColorSpaceUtils'
 const path = require('path');
 
 
@@ -58,7 +58,7 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
         }
 
         // Convert to grayscale
-        abgrToYCbCr(bmpData, bmpWidth, bmpHeight, 
+        bmpToWorkingColorspace(bmpData, bmpWidth, bmpHeight, 
             grayValues, bmpIdx * bmpWidth * bmpHeight, 
             colorValues, 2 * bmpIdx * bmpWidth * bmpHeight, 255)
     })
