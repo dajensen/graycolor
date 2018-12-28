@@ -28,8 +28,6 @@ function convertFromYCbCr(y, cb, cr) {
 // The "divisor" parameter lets the output be scaled to the appropriate range.  In this case divisor should be 255 to put the result in the range 0..1
 export function bmpToWorkingColorspace(src, width, height, yBuffer, yPos, colorBuffer, colorPos, scaleFactor) {
     let srcidx = 0
-    let CbPos = colorPos
-    let CrPos = colorPos + width * height
 
     while(srcidx < width * height * 4) {
         let r = src[srcidx + 3]
@@ -46,8 +44,9 @@ export function bmpToWorkingColorspace(src, width, height, yBuffer, yPos, colorB
             console.log("r: " + diff.r, " g: " + diff.g + " b: " + diff.b)
 */
         yBuffer[yPos++] = hsl[2] / scaleFactor
-        colorBuffer[CbPos++] = hsl[0] / scaleFactor
-        colorBuffer[CrPos++] = hsl[1] / scaleFactor
+        colorBuffer[colorPos] = hsl[0] / scaleFactor
+        colorBuffer[colorPos + 1] = hsl[1] / scaleFactor
+        colorPos += 2
         srcidx += 4
     }
 }
@@ -58,8 +57,8 @@ export function bmpFromWorkingColorspace(dst, width, height, yBuffer, colorBuffe
 
     while(srcidx < width * height) {
         let l = yBuffer[srcidx] * scaleFactor
-        let h = colorBuffer[srcidx] * scaleFactor
-        let s = colorBuffer[srcidx + width * height] * scaleFactor
+        let h = colorBuffer[2 * srcidx] * scaleFactor
+        let s = colorBuffer[2 * srcidx + 1] * scaleFactor
 
         let rgb = cs.hsl.rgb([h, s, l])
 
