@@ -25,13 +25,13 @@ function createModel(imageWidth, imageHeight) {
 
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
-//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
-//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 4}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({activation: 'relu', units: 2}))
-model.add(tf.layers.dense({activation: 'relu', units: 2}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2}))
 
     return model
 }
@@ -152,8 +152,6 @@ async function doMain(args) {
     while(trainResult > trainThreshold) {
         trainResult = await trainBatch(model, bmpdir.Color, trainFileList, groupnum++)
 
-        // Don't know why this happens, but fairly frequently the network just will not train.  If it stays high like this,
-        // there's no point in continuing.  Just try again.
         if(trainResult >= 1.0 && groupnum > 0)
             return false
 
@@ -166,7 +164,7 @@ async function doMain(args) {
         await testBatch(model, bmpdir.Color, testFileList, g)
     }
 */
-    testFileList.slice(0,1).map((file)=>{
+    testFileList.map((file)=>{
         predictColor(model, bmpdir.Color, bmpdir.Result, file, imageWidth, imageHeight)
     })
     return true
