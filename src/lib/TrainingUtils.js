@@ -62,6 +62,7 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
             grayValues, bmpIdx * bmpWidth * bmpHeight, 
             colorValues, 2 * bmpIdx * bmpWidth * bmpHeight, 255)
     })
+
     return {
         names: paths, 
         color: tf.tensor4d(colorValues, [batchSize, bmpHeight, bmpWidth, 2]), 

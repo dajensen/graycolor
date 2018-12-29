@@ -24,14 +24,14 @@ function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();
 
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
-//    model.add(tf.layers.conv2d({filters: 1, kernelSize: 16, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 8, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 4, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.dense({activation: 'relu', units: 4}))
-    model.add(tf.layers.dense({activation: 'relu', units: 4}))
-    model.add(tf.layers.dense({activation: 'relu', units: 2}))
-    model.add(tf.layers.dense({activation: 'tanh', units: 2}))
+//    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
+//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
+//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
+//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
+//    model.add(tf.layers.dense({activation: 'relu', units: 4}))
+//    model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'relu', units: 2}))
+model.add(tf.layers.dense({activation: 'relu', units: 2}))
 
     return model
 }
@@ -42,9 +42,22 @@ async function trainBatch(model, colordir, trainFileList, groupNum) {
     batch.names.map((item)=>{
         console.log(item)
     })
-    await model.fit(batch.gray, batch.color, {batchSize: batchSize, epochs: epochCount})
+
+//    let grayvals = batch.gray.dataSync()
+//    let colorvals = batch.color.dataSync()
+//    printValues(8, grayvals, colorvals)
+
+//    let rv = await model.fit(batch.gray, tf.ones([epochCount, imageHeight, imageWidth, 2]), {batchSize: batchSize, epochs: epochCount})
+    let rv = await model.fit(batch.gray, batch.color, {batchSize: batchSize, epochs: epochCount})
     batch.gray.dispose()
     batch.color.dispose()
+    return rv.history.loss[epochCount - 1]
+}
+
+function printValues(numValues, gray, color) {
+    for(let i = 0; i < numValues; i++) {
+        console.log("Val: " + gray[i] + ", " + color[2*i] + ", " + color[2*i + 1])
+    }
 }
 
 function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight) {
@@ -77,8 +90,8 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
 function printPixels(numToPrint, grayValues, colorValues, predictedValues, bmpWidth, bmpHeight) {
     console.log("============================")
     for(let i = 0; i < numToPrint; i++) {
-        console.log("hsl Orig: " + colorValues[i] + "," + colorValues[bmpWidth * bmpHeight + i] +
-                    "    hsl New: " + predictedValues[i] + "," + predictedValues[bmpWidth * bmpHeight + i])
+        console.log("hsl Orig: " + colorValues[2 * i] + "," + colorValues[2 * i + 1] +
+                    "    hsl New: " + predictedValues[2 * i] + "," + predictedValues[2 * i + 1])
     }
 }
 
@@ -131,9 +144,19 @@ async function doMain(args) {
     console.log("training items: " + trainFileList.length)
     console.log("test items: " + testFileList.length)
 
+    let trainThreshold = 0.01
+    let trainResult = 1.0
+    let groupnum = 0
+
     // Train
-    for(let g = 0; g < trainingGroups; g++) {
-        await trainBatch(model, bmpdir.Color, trainFileList, g)
+    while(trainResult > trainThreshold) {
+        trainResult = await trainBatch(model, bmpdir.Color, trainFileList, groupnum++)
+
+        // Don't know why this happens, but fairly frequently the network just will not train.  If it stays high like this,
+        // there's no point in continuing.  Just try again.
+        if(trainResult >= 1.0 && groupnum > 0)
+            return false
+
         saveModel(model)
     }
 
@@ -146,4 +169,5 @@ async function doMain(args) {
     testFileList.slice(0,1).map((file)=>{
         predictColor(model, bmpdir.Color, bmpdir.Result, file, imageWidth, imageHeight)
     })
+    return true
 }
