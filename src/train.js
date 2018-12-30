@@ -144,7 +144,7 @@ async function doMain(args) {
     console.log("training items: " + trainFileList.length)
     console.log("test items: " + testFileList.length)
 
-    let trainThreshold = 0.01
+    let trainThreshold = 0.005
     let trainResult = 1.0
     let groupnum = 0
 
