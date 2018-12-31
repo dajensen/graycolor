@@ -25,13 +25,14 @@ function createModel(imageWidth, imageHeight) {
 
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
-    model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
+model.add(tf.layers.leakyReLU())
+model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 4}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({activation: 'tanh', units: 2}))
-model.add(tf.layers.dense({activation: 'tanh', units: 2}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
     return model
 }
