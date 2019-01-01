@@ -27,6 +27,13 @@
             "name": "Makegrey",
             "program": "${workspaceRoot}/src/makegray.js",
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Split Data",
+            "program": "${workspaceRoot}/src/splitdata.js",
+            "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
         }
     ]
 }

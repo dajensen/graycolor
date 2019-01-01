@@ -1,9 +1,9 @@
-import * as tf from '@tensorflow/tfjs'; 
+import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-node';
 const path = require('path');
-import {makeCleanDir} from './lib/FileSystemUtils'
+import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
-import {splitTrainAndTestData, getRandomBatch} from './lib/TrainingUtils'
+import {getRandomBatch} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
 
 // Only for predicting.  This will be extracted later.
@@ -26,8 +26,8 @@ function createModel(imageWidth, imageHeight) {
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
 model.add(tf.layers.leakyReLU())
-model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
+model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'tanh', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'tanh', padding: 'same'}))
 //    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 4}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
@@ -137,28 +137,21 @@ async function doMain(args) {
     model.compile({optimizer: 'adam', loss: 'meanSquaredError', lr:0.3})
     model.summary();
 
-    makeCleanDir(bmpdir.Train)
-    makeCleanDir(bmpdir.Test)
     makeCleanDir(bmpdir.Result)
     
-    let {train: trainFileList, test: testFileList} = splitTrainAndTestData(bmpdir.Color, 0.25)
-    console.log("training items: " + trainFileList.length)
-    console.log("test items: " + testFileList.length)
-
     let trainThreshold = 0.005
     let trainResult = 1.0
     let groupnum = 0
 
     // Train
     while(trainResult > trainThreshold) {
-        trainResult = await trainBatch(model, bmpdir.Color, trainFileList, groupnum++)
+        trainResult = await trainBatch(model, bmpdir.Train, getBmpFileList(bmpdir.Train), groupnum++)
 
         if(trainResult >= 1.0 && groupnum > 0)
             return false
 
         saveModel(model)
     }
-
 /*
     // Test
     for(let g = 0; g < testGroups; g++) {
