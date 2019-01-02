@@ -7,11 +7,15 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Train",
-            "program": "${workspaceRoot}/src/train.js",
-            "args": [
-                "--model=/tmp/graycolor-model/"
-            ],
+            "name": "Makegrey",
+            "program": "${workspaceRoot}/src/makegray.js",
+            "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Split Data",
+            "program": "${workspaceRoot}/src/splitdata.js",
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
         },
         {
@@ -24,15 +28,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Makegrey",
-            "program": "${workspaceRoot}/src/makegray.js",
+            "name": "Continue Training",
+            "program": "${workspaceRoot}/src/train.js",
+            "args": [
+                "--model=/tmp/graycolor-model/"
+            ],
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
-        },
+        }
         {
             "type": "node",
             "request": "launch",
-            "name": "Split Data",
-            "program": "${workspaceRoot}/src/splitdata.js",
+            "name": "Test",
+            "program": "${workspaceRoot}/src/test.js",
+            "args": [
+                "--model=/tmp/graycolor-model/"
+            ],
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
         }
     ]
