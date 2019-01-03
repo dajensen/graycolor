@@ -15,6 +15,8 @@ const imageWidth = 1024
 const imageHeight = 768
 const testBatchSize = 1
 const testGroups = 1
+const learnRate = 0.3
+
 
 function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight) {
     let colorValues = new Float32Array(2 * bmpWidth * bmpHeight)
@@ -85,7 +87,7 @@ async function doMain(args) {
     else {
         throw new Error("Testing requires a trained model.\nTypical Usage: node src/test.js --model=/tmp/graycolor-model")
     }
-    model.compile({optimizer: 'adam', loss: 'meanSquaredError', lr:0.3})
+    model.compile({optimizer: 'adam', loss: 'meanSquaredError', lr:learnRate})
     model.summary();
 
     makeCleanDir(bmpdir.Result)
