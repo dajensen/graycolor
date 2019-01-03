@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-node';
+require ('@tensorflow/tfjs-node-gpu') || require ('@tensorflow/tfjs-node')
 const path = require('path');
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
