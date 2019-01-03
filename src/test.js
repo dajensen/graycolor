@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-node';
 const path = require('path');
-import {makeCleanDir} from './lib/FileSystemUtils'
+import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
 import {getRandomBatch} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
@@ -89,10 +89,12 @@ async function doMain(args) {
     model.summary();
 
     makeCleanDir(bmpdir.Result)
-        
+
+    let testFileList = getBmpFileList(bmpdir.Test)
+
     // Test
     for(let g = 0; g < testGroups; g++) {
-        await testBatch(model, bmpdir.Color, testFileList, g)
+        await testBatch(model, bmpdir.Test, testFileList, g)
     }
 
     // Generate images
