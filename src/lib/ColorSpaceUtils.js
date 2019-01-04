@@ -70,3 +70,48 @@ export function bmpFromWorkingColorspace(dst, width, height, yBuffer, colorBuffe
         srcidx++
     }
 }
+
+export function bmpToWorkingColorspaceAe(src, width, height, colorBuffer, colorPos, scaleFactor) {
+    let srcidx = 0
+
+    while(srcidx < width * height * 4) {
+        let r = src[srcidx + 3]
+        let g = src[srcidx + 2]
+        let b = src[srcidx + 1]
+        // let a = src[srcidx]
+
+        let hsl = cs.rgb.hsl([r, g, b])
+/*
+        // Check the math
+        let tst = cs.hsl.rgb([hsl[0], hsl[1], hsl[2]])        
+        let diff = {r: r - Math.floor(tst[0] + 0.1), g: g - Math.floor(tst[1] + 0.1), b: b - Math.floor(tst[2] + 0.1)}
+        if(diff.r != 0 || diff.g != 0 || diff.b != 0)
+            console.log("r: " + diff.r, " g: " + diff.g + " b: " + diff.b)
+*/
+        colorBuffer[colorPos] = hsl[0] / scaleFactor
+        colorBuffer[colorPos + 1] = hsl[1] / scaleFactor
+        colorBuffer[colorPos + 2] = hsl[2] / scaleFactor
+        colorPos += 3
+        srcidx += 4
+    }
+}
+
+export function bmpFromWorkingColorspaceAe(dst, width, height, colorBuffer, scaleFactor) {
+    let srcidx = 0
+    let dstidx = 0
+
+    while(srcidx < width * height) {
+        let h = colorBuffer[3 * srcidx] * scaleFactor
+        let s = colorBuffer[3 * srcidx + 1] * scaleFactor
+        let l = colorBuffer[3 * srcidx + 2] * scaleFactor
+
+        let rgb = cs.hsl.rgb([h, s, l])
+
+        dst[dstidx] = 0
+        dst[dstidx + 1] = rgb[2]
+        dst[dstidx + 2] = rgb[1]
+        dst[dstidx + 3] = rgb[0]
+        dstidx += 4
+        srcidx++
+    }
+}

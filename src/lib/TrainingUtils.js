@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs'; 
 import {makeCleanDir, getBmpFileList} from './FileSystemUtils'
 import {loadBmp, saveGrayscaleBmp} from './BmpFileUtils'
-import {bmpToWorkingColorspace} from './ColorSpaceUtils'
+import {bmpToWorkingColorspace, bmpToWorkingColorspaceAe} from './ColorSpaceUtils'
 const path = require('path');
 
 
@@ -67,5 +67,36 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
         names: paths, 
         color: tf.tensor4d(colorValues, [batchSize, bmpHeight, bmpWidth, 2]), 
         gray: tf.tensor4d(grayValues, [batchSize, bmpHeight, bmpWidth, 1])
+    }
+}
+
+export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeight) {
+    let inputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
+    let outputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
+
+    let colorIdx = 0
+    let grayIdx = 0
+
+    let paths = reservoirSample(fileList, batchSize)
+
+    paths.map((file, bmpIdx)=>{
+        // Read the rgb data from the file
+        let {width: thisWidth, height: thisHeight, data: bmpData} = loadBmp(path.join(srcDir, file))
+        if(thisWidth != bmpWidth || thisHeight != bmpHeight) {
+            throw new Error("Dimensions don't match in " + file)
+        }
+
+        // Convert to grayscale
+        bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, 
+            outputValues, 3 * bmpIdx * bmpWidth * bmpHeight, 255)
+
+        // For now, input and output are exactly equal
+        inputValues = outputValues
+    })
+
+    return {
+        names: paths, 
+        input: tf.tensor4d(inputValues, [batchSize, bmpHeight, bmpWidth, 3]), 
+        output: tf.tensor4d(outputValues, [batchSize, bmpHeight, bmpWidth, 3]), 
     }
 }

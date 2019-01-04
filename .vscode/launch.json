@@ -22,24 +22,24 @@
             "type": "node",
             "request": "launch",
             "name": "Initial Train",
-            "program": "${workspaceRoot}/src/train.js",
+            "program": "${workspaceRoot}/src/train_ae.js",
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Continue Training",
-            "program": "${workspaceRoot}/src/train.js",
+            "program": "${workspaceRoot}/src/train_ae.js",
             "args": [
                 "--model=/tmp/graycolor-model/"
             ],
             "outFiles": [ "${workspaceRoot}/compiled/**/*.js" ]
-        }
+        },
         {
             "type": "node",
             "request": "launch",
             "name": "Test",
-            "program": "${workspaceRoot}/src/test.js",
+            "program": "${workspaceRoot}/src/test_ae.js",
             "args": [
                 "--model=/tmp/graycolor-model/"
             ],
