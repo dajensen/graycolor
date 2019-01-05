@@ -19,25 +19,23 @@ const batchSize = 5
 const epochCount = 10
 const learnRate = 0.3           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
 let trainThreshold = 0.0001
+const gridSize = 2
 
 function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();
 
-    model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-//    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
-model.add(tf.layers.conv2d({filters: 3, kernelSize: 8, strides: 1, padding: 'same'}))
-model.add(tf.layers.conv2d({filters: 3, kernelSize: 4, strides: 1, padding: 'same'}))
-//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
-//    model.add(tf.layers.dense({activation: 'relu', units: 4}))
-//    model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
+model.add(tf.layers.conv2d({filters: 3, kernelSize: 8, strides: 1, padding: 'same', activation: 'tanh'}))
+model.add(tf.layers.conv2d({filters: 3, kernelSize: 4, strides: 1, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.dense({activation: 'relu', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'relu', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
     return model
 }
 
 async function trainBatch(model, colordir, trainFileList, groupNum) {
-    let batch = getRandomBatchAe(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight)
+    let batch = getRandomBatchAe(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight, gridSize)
     console.log("Training Group " + groupNum)
     batch.names.map((item)=>{
         console.log(item)

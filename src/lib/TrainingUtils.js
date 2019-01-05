@@ -70,8 +70,7 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
     }
 }
 
-export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeight) {
-    let inputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
+export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeight, gridSize) {
     let outputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
 
     let colorIdx = 0
@@ -90,13 +89,40 @@ export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeigh
         bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, 
             outputValues, 3 * bmpIdx * bmpWidth * bmpHeight, 255)
 
+
         // For now, input and output are exactly equal
-        inputValues = outputValues
+        let inputValues = Array.from(outputValues)
+        discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize);
+            
     })
 
     return {
         names: paths, 
         input: tf.tensor4d(inputValues, [batchSize, bmpHeight, bmpWidth, 3]), 
         output: tf.tensor4d(outputValues, [batchSize, bmpHeight, bmpWidth, 3]), 
+    }
+}
+
+export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
+    for(let row = 0; row < bmpHeight; row++) {
+        let bmppos = i * bmpWidth * 3
+        if((row % gridSize) == 0) {
+            // This row has pixels that should be kept
+            for(let col = 0; col < bmpWidth; col++) {
+                if((col & gridSize) != 0) {
+                    bmpData[bmppos] = 0
+                    bmpData[bmppos + 1] = 0    
+                }
+                bmppos += 3
+            }    
+        }
+        else {
+            // This row should be entirely discarded
+            for(let col = 0; col < bmpWidth; col++) {
+                bmpData[bmppos] = 0
+                bmpData[bmppos + 1] = 0
+                bmppos += 3
+            }
+        }
     }
 }

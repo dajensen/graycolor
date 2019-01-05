@@ -3,7 +3,7 @@ require ('@tensorflow/tfjs-node-gpu') || require ('@tensorflow/tfjs-node')
 const path = require('path');
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
-import {getRandomBatch} from './lib/TrainingUtils'
+import {getRandomBatch, discardColorLeaveGrid} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
 
 const imageWidth = 1024
