@@ -17,8 +17,8 @@ const imageHeight = 768
 const epochBatchSize = 10
 const batchSize = 5
 const epochCount = 10
-const learnRate = 0.3
-let trainThreshold = 0.07
+const learnRate = 0.3           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
+let trainThreshold = 0.0001
 
 function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();

@@ -20,6 +20,7 @@ const learnRate = 0.3
 
 function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight) {
     let inputValues = new Float32Array(3 * bmpWidth * bmpHeight)
+    let outputValues = new Float32Array(3 * bmpWidth * bmpHeight)
     let origBmpData = new Uint8Array(4 * bmpWidth * bmpHeight)
     let newBmpData = new Uint8Array(4 * bmpWidth * bmpHeight)
 
@@ -37,7 +38,18 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     bmpFromWorkingColorspaceAe(origBmpData, bmpWidth, bmpHeight, inputValues, 255)
     saveColorBmp(path.join(resultdir, filename + ".o.bmp"), bmpWidth, bmpHeight, origBmpData)
 
-    // This is the actual conversion based on inference
+    // This is a test that uses the inference, but adds back the luminosity values from the original data
+    let i = 0
+    while (i < bmpWidth * bmpHeight * 3) {
+        outputValues[i] = rsp[i]
+        outputValues[i+1] = rsp[i + 1]
+        outputValues[i+2] = inputValues[i + 2]
+        i += 3
+    }
+    bmpFromWorkingColorspaceAe(origBmpData, bmpWidth, bmpHeight, outputValues, 255)
+    saveColorBmp(path.join(resultdir, filename + ".r.bmp"), bmpWidth, bmpHeight, origBmpData)
+    
+    // This is the actual conversion using only inference
     bmpFromWorkingColorspaceAe(newBmpData, bmpWidth, bmpHeight, rsp, 255)
     saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
 
