@@ -72,6 +72,7 @@ export function getRandomBatch(srcDir, fileList, batchSize, bmpWidth, bmpHeight)
 
 export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeight, gridSize) {
     let outputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
+    let inputValues = new Float32Array(batchSize * bmpWidth * bmpHeight * 3)
 
     let colorIdx = 0
     let grayIdx = 0
@@ -85,13 +86,16 @@ export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeigh
             throw new Error("Dimensions don't match in " + file)
         }
 
+        let outputLoc = 3 * bmpIdx * bmpWidth * bmpHeight
+
         // Convert to grayscale
-        bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, 
-            outputValues, 3 * bmpIdx * bmpWidth * bmpHeight, 255)
+        bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, outputValues, outputLoc, 255)
 
 
         // For now, input and output are exactly equal
-        let inputValues = Array.from(outputValues)
+        for(let i = 0; i < bmpWidth * bmpHeight * 3; i++)
+            inputValues[outputLoc + i] = outputValues[outputLoc + i]
+            
         discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize);
             
     })
@@ -105,7 +109,7 @@ export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeigh
 
 export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
     for(let row = 0; row < bmpHeight; row++) {
-        let bmppos = i * bmpWidth * 3
+        let bmppos = row * bmpWidth * 3
         if((row % gridSize) == 0) {
             // This row has pixels that should be kept
             for(let col = 0; col < bmpWidth; col++) {
