@@ -111,11 +111,17 @@ export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
     for(let row = 0; row < bmpHeight; row++) {
         let bmppos = row * bmpWidth * 3
         if((row % gridSize) == 0) {
+            let h = 0
+            let s = 0
             // This row has pixels that should be kept
             for(let col = 0; col < bmpWidth; col++) {
                 if((col % gridSize) != 0) {
-                    bmpData[bmppos] = 0
-                    bmpData[bmppos + 1] = 0    
+                    bmpData[bmppos] = h
+                    bmpData[bmppos + 1] = s    
+                }
+                else {
+                    h = bmpData[bmppos]
+                    s = bmpData[bmppos + 1]
                 }
                 bmppos += 3
             }    
@@ -123,8 +129,8 @@ export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
         else {
             // This row should be entirely discarded
             for(let col = 0; col < bmpWidth; col++) {
-                bmpData[bmppos] = 0
-                bmpData[bmppos + 1] = 0
+                bmpData[bmppos] = bmpData[bmppos - bmpWidth * 3]
+                bmpData[bmppos + 1] = bmpData[bmppos - bmpWidth * 3 + 1]
                 bmppos += 3
             }
         }

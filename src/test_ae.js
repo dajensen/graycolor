@@ -16,7 +16,7 @@ const imageHeight = 768
 const testBatchSize = 1
 const testGroups = 1
 const learnRate = 0.3
-const gridSize = 4
+const gridSize = 10
 
 
 function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight) {
