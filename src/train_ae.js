@@ -33,6 +33,8 @@ model.add(tf.layers.dense({name: 'dense1', activation: 'relu', units: 32, kernel
 model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 model.add(tf.layers.dense({name: 'output', activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 */
+
+// Encoder
 model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
 model.add(tf.layers.conv2d({filters: 16, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
@@ -40,6 +42,11 @@ model.add(tf.layers.conv2d({filters: 32, kernelSize: 5, strides: 2, padding: 'sa
 model.add(tf.layers.dropout({rate: dropoutRate}))
 model.add(tf.layers.conv2d({filters: 64, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
+
+model.add(tf.layers.dense({name: 'dense1', activation: 'relu', units: 64, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 64, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+
+// Decoder
 model.add(tf.layers.conv2dTranspose({filters: 64, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
 model.add(tf.layers.conv2dTranspose({filters: 32, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
