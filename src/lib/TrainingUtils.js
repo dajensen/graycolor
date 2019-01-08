@@ -120,8 +120,8 @@ export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
                     bmpData[bmppos + 1] = s    
                 }
                 else {
-                    h = bmpData[bmppos]
-                    s = bmpData[bmppos + 1]
+//                    h = bmpData[bmppos]
+//                    s = bmpData[bmppos + 1]
                 }
                 bmppos += 3
             }    
