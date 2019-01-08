@@ -32,7 +32,7 @@ function reservoirSample(src, destLen) {
     }
 
     for(let i = destLen; i < src.length; i++) {
-        let j = getRandomIntInclusive(1, i)
+        let j = getRandomIntInclusive(0, i)
         if(j < destLen) {
             dest[j] = src[i]
         }
