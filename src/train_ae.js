@@ -17,7 +17,7 @@ const imageHeight = 768
 const epochBatchSize = 10
 const batchSize = 5
 const epochCount = 10
-const learnRate = 0.1           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
+const learnRate = 0.3           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
 let trainThreshold = 0.0001
 const gridSize = 9
 
@@ -27,12 +27,13 @@ function createModel(imageWidth, imageHeight) {
 
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
-model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
-model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
+model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
+model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
 //    model.add(tf.layers.dense({activation: 'relu', units: 4}))
-model.add(tf.layers.dense({activation: 'relu', units: 4, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({activation: 'relu', units: 4, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
     return model
