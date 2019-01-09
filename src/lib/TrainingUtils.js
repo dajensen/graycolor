@@ -138,3 +138,36 @@ export function discardColorLeaveGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
         }
     }
 }
+
+export function discardColorFillGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
+    if((gridSize % 1) == 1) {
+        throw new Error("For performance reasons, this function only works with odd sized grids")
+    }
+    const marginToCenter = Math.floor(gridSize / 2)
+    const upperLeftToCenter = 3 * (bmpWidth * marginToCenter + marginToCenter)
+
+
+    for(let row = 0; row + gridSize < bmpHeight; row += gridSize) {
+        for (let col = 0; col + gridSize < bmpWidth; col += gridSize) {
+            // This copies one grid cell
+            let pos = 3 * (row * bmpWidth + col)
+            let centerpos = pos + upperLeftToCenter
+            for(let i = 0; i < gridSize; i++) {
+                for(let j = 0; j < gridSize; j++) {
+                    bmpData[pos + 3*(i + j*bmpWidth)] = bmpData[centerpos]
+                    bmpData[pos + 3*(i + j*bmpWidth) + 1] = bmpData[centerpos + 1]    
+//                    bmpData[pos + 3*i + 3*j*bmpWidth] = 0
+//                    bmpData[pos + 3*i + 3*j*bmpWidth + 1] = 0
+                }
+            }
+        }
+
+        // Mop up partial grid cel
+
+    }
+
+    // Mop up partial rows
+
+    // Corner is both partial row and partial column
+
+}

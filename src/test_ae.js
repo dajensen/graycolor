@@ -3,7 +3,7 @@ import '@tensorflow/tfjs-node';
 const path = require('path');
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
-import {getRandomBatchAe, discardColorLeaveGrid} from './lib/TrainingUtils'
+import {getRandomBatchAe, discardColorLeaveGrid, discardColorFillGrid} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
 
 // Only for predicting.  This will be extracted later.
@@ -16,7 +16,7 @@ const imageHeight = 768
 const testBatchSize = 1
 const testGroups = 1
 const learnRate = 0.3
-const gridSize = 10
+const gridSize = 9
 
 
 function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight) {
@@ -29,7 +29,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
 
     // Convert to grayscale
     bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
-//    discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize)
+    discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
     let inputTensor = tf.tensor4d(inputValues, [1, bmpHeight, bmpWidth, 3])
     let predictedTensor = model.predict(inputTensor, {batchSize: 1})
