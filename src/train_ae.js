@@ -14,51 +14,33 @@ var argv = require('minimist')(process.argv.slice(2));
 
 const imageWidth = 1024
 const imageHeight = 768
-const epochBatchSize = 2
-const batchSize = 1
+const epochBatchSize = 10
+const batchSize = 5
 const epochCount = 10
 const learnRate = 0.1           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
 let trainThreshold = 0.0001
 const gridSize = 9
-const dropoutRate = 1.0
+
 
 function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();
 
-/*
-model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-model.add(tf.layers.conv2d({filters: 3, kernelSize: 16, strides: 1, padding: 'same', activation: 'tanh'}))
-model.add(tf.layers.conv2d({filters: 3, kernelSize: 8, strides: 1, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dense({name: 'dense1', activation: 'relu', units: 32, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({name: 'output', activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-*/
-
-// Encoder
-model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-model.add(tf.layers.conv2d({filters: 16, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2d({filters: 32, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2d({filters: 64, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-
-// Decoder
-model.add(tf.layers.conv2dTranspose({filters: 64, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2dTranspose({filters: 32, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2dTranspose({filters: 16, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
-model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({name: 'output', activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-
+    model.add(tf.layers.inputLayer({inputShape: [768, 1024, 1]}))
+//    model.add(tf.layers.dense({activation: 'relu', units: 1, inputShape: [768, 1024, 1]}))
+model.add(tf.layers.leakyReLU())
+model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'tanh', padding: 'same'}))
+model.add(tf.layers.conv2d({filters: 4, kernelSize: 3, strides: 1, activation: 'tanh', padding: 'same'}))
+//    model.add(tf.layers.conv2d({filters: 2, kernelSize: 2, strides: 1, activation: 'relu', padding: 'same'}))
+//    model.add(tf.layers.dense({activation: 'relu', units: 4}))
+model.add(tf.layers.dense({activation: 'relu', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+model.add(tf.layers.dense({activation: 'tanh', units: 2, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
     return model
 }
 
 async function trainBatch(model, colordir, trainFileList, groupNum) {
-    let batch = getRandomBatchAe(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight, gridSize)
+    let batch = getRandomBatch(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight, gridSize)
     console.log("Training Group " + groupNum)
     batch.names.map((item)=>{
         console.log(item)
