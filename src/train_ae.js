@@ -19,7 +19,7 @@ const batchSize = 1
 const epochCount = 10
 const learnRate = 0.1           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
 let trainThreshold = 0.0001
-const gridSize = 10
+const gridSize = 9
 const dropoutRate = 1.0
 
 function createModel(imageWidth, imageHeight) {
@@ -36,23 +36,21 @@ model.add(tf.layers.dense({name: 'output', activation: 'tanh', units: 3, kernelI
 
 // Encoder
 model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-model.add(tf.layers.conv2d({filters: 16, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2d({filters: 16, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2d({filters: 32, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2d({filters: 32, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2d({filters: 64, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2d({filters: 64, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
-
-model.add(tf.layers.dense({name: 'dense1', activation: 'relu', units: 64, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 64, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
 // Decoder
-model.add(tf.layers.conv2dTranspose({filters: 64, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2dTranspose({filters: 64, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2dTranspose({filters: 32, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2dTranspose({filters: 32, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
-model.add(tf.layers.conv2dTranspose({filters: 16, kernelSize: 5, strides: 2, padding: 'same', activation: 'relu'}))
+model.add(tf.layers.conv2dTranspose({filters: 16, kernelSize: 9, strides: 2, padding: 'same', activation: 'relu'}))
 model.add(tf.layers.dropout({rate: dropoutRate}))
+model.add(tf.layers.dense({name: 'dense2', activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 model.add(tf.layers.dense({name: 'output', activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
 
 
