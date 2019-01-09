@@ -29,7 +29,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
 
     // Convert to grayscale
     bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
-    discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize)
+//    discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
     let inputTensor = tf.tensor4d(inputValues, [1, bmpHeight, bmpWidth, 3])
     let predictedTensor = model.predict(inputTensor, {batchSize: 1})

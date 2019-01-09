@@ -96,7 +96,7 @@ export function getRandomBatchAe(srcDir, fileList, batchSize, bmpWidth, bmpHeigh
         for(let i = 0; i < bmpWidth * bmpHeight * 3; i++)
             inputValues[outputLoc + i] = outputValues[outputLoc + i]
             
-        discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize);
+//        discardColorLeaveGrid(inputValues, bmpWidth, bmpHeight, gridSize);
             
     })
 
