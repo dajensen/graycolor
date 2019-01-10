@@ -18,7 +18,7 @@ const epochBatchSize = 5
 const batchSize = 2
 const epochCount = 10
 const learnRate = 0.1           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
-let trainThreshold = 0.003
+let trainThreshold = 0.002
 const gridSize = 9
 
 
