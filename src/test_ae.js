@@ -32,7 +32,11 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
     let inputTensor = tf.tensor4d(inputValues, [1, bmpHeight, bmpWidth, 3])
+
+    const startPredict = process.hrtime();
     let predictedTensor = model.predict(inputTensor, {batchSize: 1})
+    const elapsed = process.hrtime(startPredict)
+    console.log("Prediction time: " + elapsed + "ns")
 
     let rsp = predictedTensor.dataSync()
 
@@ -55,7 +59,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     bmpFromWorkingColorspaceAe(newBmpData, bmpWidth, bmpHeight, rsp, 255)
     saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
 
-    printPixels(24, inputValues, rsp, bmpWidth, bmpHeight)
+//    printPixels(24, inputValues, rsp, bmpWidth, bmpHeight)
 }
 
 function printPixels(numToPrint, origValues, predictedValues) {
