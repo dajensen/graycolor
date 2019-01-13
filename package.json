@@ -2,7 +2,7 @@
   "name": "graycolor",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "exports.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "babel src --out-dir compiled --source-maps --watch"
