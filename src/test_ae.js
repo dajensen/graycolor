@@ -3,12 +3,12 @@ import '@tensorflow/tfjs-node';
 const path = require('path');
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
-import {getRandomBatchAe, discardColorLeaveGrid, discardColorFillGrid} from './lib/TrainingUtils'
+import {getRandomBatch, discardColorLeaveGrid, discardColorFillGrid} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
 
 // Only for predicting.  This will be extracted later.
 import {loadBmp, saveColorBmp} from './lib/BmpFileUtils'
-import {bmpToWorkingColorspaceAe, bmpFromWorkingColorspaceAe} from './lib/ColorSpaceUtils'
+import {bmpToHSLWorking, bmpFromHSLWorking} from './lib/ColorSpaceUtils'
 
 
 const imageWidth = 1024
@@ -28,20 +28,23 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     let {width: thisWidth, height: thisHeight, data: bmpData} = loadBmp(path.join(colordir, filename))
 
     // Convert to grayscale
-    bmpToWorkingColorspaceAe(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
+    bmpToHSLWorking(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
     discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
     let inputTensor = tf.tensor4d(inputValues, [1, bmpHeight, bmpWidth, 3])
 
+    let predictedTensor = null
     const startPredict = process.hrtime();
-    let predictedTensor = model.predict(inputTensor, {batchSize: 1})
+    for(let i = 0; i < 10; i++) {
+        predictedTensor = model.predict(inputTensor, {batchSize: 1})
+    }
     const elapsed = process.hrtime(startPredict)
-    console.log("Prediction time: " + elapsed + "ns")
+    console.log("Prediction time (10 evaluations): " + elapsed + "ns")
 
     let rsp = predictedTensor.dataSync()
 
     // This is a test that cuts out all of the inference, to see whether the bitmap save/restore code is correct.
-    bmpFromWorkingColorspaceAe(origBmpData, bmpWidth, bmpHeight, inputValues, 255)
+    bmpFromHSLWorking(origBmpData, bmpWidth, bmpHeight, inputValues, 255)
     saveColorBmp(path.join(resultdir, filename + ".o.bmp"), bmpWidth, bmpHeight, origBmpData)
 
     // This is a test that uses the inference, but adds back the luminosity values from the original data
@@ -52,11 +55,11 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
         outputValues[i+2] = inputValues[i + 2]
         i += 3
     }
-    bmpFromWorkingColorspaceAe(origBmpData, bmpWidth, bmpHeight, outputValues, 255)
+    bmpFromHSLWorking(origBmpData, bmpWidth, bmpHeight, outputValues, 255)
     saveColorBmp(path.join(resultdir, filename + ".r.bmp"), bmpWidth, bmpHeight, origBmpData)
     
     // This is the actual conversion using only inference
-    bmpFromWorkingColorspaceAe(newBmpData, bmpWidth, bmpHeight, rsp, 255)
+    bmpFromHSLWorking(newBmpData, bmpWidth, bmpHeight, rsp, 255)
     saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
 
 //    printPixels(24, inputValues, rsp, bmpWidth, bmpHeight)
@@ -72,7 +75,7 @@ function printPixels(numToPrint, origValues, predictedValues) {
 
 async function testBatch(model, colordir, testFileList, groupNum) {
     console.dir(testFileList)
-    let batch = getRandomBatchAe(colordir, testFileList, testBatchSize, imageWidth, imageHeight, gridSize)
+    let batch = getRandomBatch(colordir, testFileList, testBatchSize, imageWidth, imageHeight)
     console.log("Testing Group " + groupNum)
     await model.evaluate(batch.input, batch.output, {batchSize: testBatchSize, epochs: 1})
     batch.input.dispose()

@@ -9,7 +9,7 @@ require ('@tensorflow/tfjs-node-gpu') || require ('@tensorflow/tfjs-node')
 const path = require('path');
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
-import {getRandomBatchAe} from './lib/TrainingUtils'
+import {getRandomBatch} from './lib/TrainingUtils'
 var argv = require('minimist')(process.argv.slice(2));
 
 const imageWidth = 1024
@@ -25,7 +25,7 @@ const gridSize = 9
 function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();
 
-/*
+
     // This is a pretty good model, but it's slower than I'd like.
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
     model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
@@ -34,22 +34,21 @@ function createModel(imageWidth, imageHeight) {
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-*/
 
 // Trying a simpler model to see if it will work well enough and be faster.
-
+/*
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
     model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 8, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.dense({activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 4, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-
+*/
     return model
 }
 
 async function trainBatch(model, colordir, trainFileList, groupNum) {
-    let batch = getRandomBatchAe(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight, gridSize)
+    let batch = getRandomBatch(colordir, trainFileList, epochBatchSize, imageWidth, imageHeight, gridSize)
     console.log("Training Group " + groupNum)
     batch.names.map((item)=>{
         console.log(item)
