@@ -28,7 +28,11 @@ function createModel(imageWidth, imageHeight) {
 
     // This is a pretty good model, but it's slower than I'd like.
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-    model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 12, kernelSize: 9, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 12, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))

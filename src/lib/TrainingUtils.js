@@ -119,12 +119,12 @@ export function discardColorFillGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
             // This copies one grid cell
             let pos = 3 * (row * bmpWidth + col)
             let centerpos = pos + upperLeftToCenter
+            let centerH = bmpData[centerpos]
+            let centerS = bmpData[centerpos + 1]
             for(let i = 0; i < gridSize; i++) {
                 for(let j = 0; j < gridSize; j++) {
-                    bmpData[pos + 3*(i + j*bmpWidth)] = bmpData[centerpos]
-                    bmpData[pos + 3*(i + j*bmpWidth) + 1] = bmpData[centerpos + 1]    
-//                    bmpData[pos + 3*i + 3*j*bmpWidth] = 0
-//                    bmpData[pos + 3*i + 3*j*bmpWidth + 1] = 0
+                    bmpData[pos + 3*(i + j*bmpWidth)] = centerH
+                    bmpData[pos + 3*(i + j*bmpWidth) + 1] = centerS
                 }
             }
         }

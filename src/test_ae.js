@@ -29,17 +29,19 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
 
     // Convert to grayscale
     bmpToHSLWorking(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
+//    discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
     discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
     let inputTensor = tf.tensor4d(inputValues, [1, bmpHeight, bmpWidth, 3])
 
     let predictedTensor = null
     const startPredict = process.hrtime();
-    for(let i = 0; i < 10; i++) {
+    let tryCount = 1
+    for(let i = 0; i < tryCount; i++) {
         predictedTensor = model.predict(inputTensor, {batchSize: 1})
     }
     const elapsed = process.hrtime(startPredict)
-    console.log("Prediction time (10 evaluations): " + elapsed + "ns")
+    console.log("Prediction time (" + tryCount  + "evaluations): " + elapsed + "ns")
 
     let rsp = predictedTensor.dataSync()
 
