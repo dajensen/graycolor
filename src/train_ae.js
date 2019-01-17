@@ -26,27 +26,22 @@ function createModel(imageWidth, imageHeight) {
     const model = tf.sequential();
 
 
-    // This is a pretty good model, but it's slower than I'd like.
+    // This is a fast model, but the results aren't good enough.  Trying to improve from here.
 /*
-    model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
-    model.add(tf.layers.conv2d({filters: 12, kernelSize: 9, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 12, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.conv2d({filters: 24, kernelSize: 4, strides: 1, activation: 'relu', padding: 'same'}))
-    model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-    model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-    model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-    model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-*/
-
-// Trying a simpler model to see if it will work well enough and be faster.
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
     model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 8, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.dense({activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 4, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+    model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+*/
+
+// Trying a simpler model to see if it will work well enough and be faster.
+    model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
+    model.add(tf.layers.conv2d({filters: 4, kernelSize: 9, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
+    model.add(tf.layers.conv2d({filters: 8, kernelSize: 5, strides: 1, activation: 'relu', padding: 'same'}))
+    model.add(tf.layers.dense({activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+    model.add(tf.layers.dense({activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     return model
 }
