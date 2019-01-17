@@ -1,6 +1,6 @@
 const path = require('path');
 import {loadBmp, saveGrayscaleBmp} from './lib/BmpFileUtils'
-import {bmpToWorkingColorspace} from './lib/ColorSpaceUtils'
+import {bmpToHSLWorking} from './lib/ColorSpaceUtils'
 import {makeCleanDir, getBmpFileList} from './lib/FileSystemUtils'
 import bmpdir from './lib/Directories'
 let fs = require('fs')
@@ -17,19 +17,22 @@ function saveColorGrid(filename, bmpWidth, bmpHeight, bmpData, gridSize) {
     let clrPos = 0
 
     for(let i = 0; i < samplesPerCol; i++) {
-        let pos = 3 * (bmpWidth * i * gridSize + upperLeftToCenter)
+        let pos = 4 * i * gridSize * bmpWidth + 4 * marginToCenter
         for(let j = 0; j < samplesPerRow; j++) {
             let hsl = cs.rgb.hsl([
-                bmpData[pos + 3], 
-                bmpData[pos + 2], 
-                bmpData[pos + 1]])
-            if(i < 10 && j < 10)
-                console.log("h: " + hsl[0] + " s: " + hsl[1])
+                bmpData[pos + 3],   // Red
+                bmpData[pos + 2],   // Green
+                bmpData[pos + 1]   // Blue
+            ])
 
-            clrValues[clrPos] = hsl[0]
-            clrValues[clrPos + 1] = hsl[1]
+            clrValues[clrPos] = hsl[0] * 255 / 360; // scale hue to 0-255
+            clrValues[clrPos + 1] = hsl[1] * 255 / 100; // scale saturation to 0-255
+
+            if(i < 10 && j < 10)
+                console.log("h: " + clrValues[clrPos] + " s: " + clrValues[clrPos + 1])
+
             clrPos += 2
-            pos += 3 * gridSize
+            pos += 4 * gridSize
         }
     }
     fs.writeFileSync(filename, clrValues)
@@ -49,14 +52,16 @@ makeCleanDir(bmpdir.Grayscale)
 
 getBmpFileList(bmpdir.Color).map((file)=>{
     let {width: bmpWidth, height: bmpHeight, data: bmpData} = loadBmp(path.join(bmpdir.Color, file))
-
-    let colorValues = new Float32Array(1 * bmpWidth * bmpHeight * 2)
-    let grayValues = new Uint8Array(1 * bmpWidth * bmpHeight)
+    let colorValues = new Float32Array(1 * bmpWidth * bmpHeight * 3)
     
-    bmpToWorkingColorspace(bmpData, bmpWidth, bmpHeight, 
-        grayValues, 0, colorValues, 0, 1)
+    bmpToHSLWorking(bmpData, bmpWidth, bmpHeight, colorValues, 0)
 
+    let grayValues = new Uint8Array(bmpWidth * bmpHeight)
+    for(let i = 0; i < bmpWidth * bmpHeight; i++) {
+        grayValues[i] = colorValues[i * 3 + 2] * 255
+    }
     saveGrayscaleBmp(path.join(bmpdir.Grayscale, file), bmpWidth, bmpHeight, grayValues)
+
     saveGrayscaleGrid(path.join(bmpdir.Grayscale, file + '.gray.bin'), bmpWidth, bmpHeight, grayValues)
     saveColorGrid(path.join(bmpdir.Grayscale, file + '.clr.bin'), bmpWidth, bmpHeight, bmpData, gridSize)
 })

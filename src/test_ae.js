@@ -28,7 +28,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     let {width: thisWidth, height: thisHeight, data: bmpData} = loadBmp(path.join(colordir, filename))
 
     // Convert to grayscale
-    bmpToHSLWorking(bmpData, bmpWidth, bmpHeight, inputValues, 0, 255)
+    bmpToHSLWorking(bmpData, bmpWidth, bmpHeight, inputValues, 0)
 //    discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
     discardColorFillGrid(inputValues, bmpWidth, bmpHeight, gridSize)
         
@@ -46,7 +46,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     let rsp = predictedTensor.dataSync()
 
     // This is a test that cuts out all of the inference, to see whether the bitmap save/restore code is correct.
-    bmpFromHSLWorking(origBmpData, bmpWidth, bmpHeight, inputValues, 255)
+    bmpFromHSLWorking(origBmpData, bmpWidth, bmpHeight, inputValues)
     saveColorBmp(path.join(resultdir, filename + ".o.bmp"), bmpWidth, bmpHeight, origBmpData)
 
     // This is a test that uses the inference, but adds back the luminosity values from the original data
@@ -62,7 +62,7 @@ function predictColor(model, colordir, resultdir, filename, bmpWidth, bmpHeight)
     
     // This is the actual conversion using only inference
     bmpFromHSLWorking(newBmpData, bmpWidth, bmpHeight, rsp, 255)
-    saveColorBmp(path.join(resultdir, filename), bmpWidth, bmpHeight, newBmpData)
+    saveColorBmp(path.join(resultdir, filename + ".a.bmp"), bmpWidth, bmpHeight, newBmpData)
 
 //    printPixels(24, inputValues, rsp, bmpWidth, bmpHeight)
 }

@@ -22,7 +22,6 @@ export function loadBmp(filename) {
 
 export function saveGrayscaleBmp(filename, width, height, data) {
 
-
     var newDataBuffer = encode({width: width, height: height, data: data, planes: 1, bpp: 8, palette: grayscalePalette()})
 
     fs.writeFileSync(filename, newDataBuffer.data)

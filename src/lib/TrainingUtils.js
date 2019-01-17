@@ -113,7 +113,6 @@ export function discardColorFillGrid(bmpData, bmpWidth, bmpHeight, gridSize) {
     const marginToCenter = Math.floor(gridSize / 2)
     const upperLeftToCenter = 3 * (bmpWidth * marginToCenter + marginToCenter)
 
-
     for(let row = 0; row + gridSize < bmpHeight; row += gridSize) {
         for (let col = 0; col + gridSize < bmpWidth; col += gridSize) {
             // This copies one grid cell

@@ -2,7 +2,7 @@ import { divStrict } from "@tensorflow/tfjs";
 var cs = require("color-space");
 
 
-export function bmpToHSLWorking(src, width, height, colorBuffer, colorPos, scaleFactor) {
+export function bmpToHSLWorking(src, width, height, colorBuffer, colorPos) {
     let srcidx = 0
 
     while(srcidx < width * height * 4) {
@@ -21,7 +21,7 @@ export function bmpToHSLWorking(src, width, height, colorBuffer, colorPos, scale
     }
 }
 
-export function bmpFromHSLWorking(dst, width, height, colorBuffer, scaleFactor) {
+export function bmpFromHSLWorking(dst, width, height, colorBuffer) {
     let srcidx = 0
     let dstidx = 0
 

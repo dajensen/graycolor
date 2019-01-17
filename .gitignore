@@ -64,3 +64,4 @@ compiled
 data/color_fullset
 data/gray/*.clr.bin
 data/gray/*.gray.bin
+data/color.single/

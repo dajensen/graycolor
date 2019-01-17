@@ -14,8 +14,8 @@ var argv = require('minimist')(process.argv.slice(2));
 
 const imageWidth = 1024
 const imageHeight = 768
-const epochBatchSize = 5
-const batchSize = 2
+const epochBatchSize = 10
+const batchSize = 5
 const epochCount = 10
 const learnRate = 0.1           // Can go down to .05 and maybe even .01.  Needs to go down as the cost function decreases.
 let trainThreshold = 0.002
@@ -27,6 +27,7 @@ function createModel(imageWidth, imageHeight) {
 
 
     // This is a pretty good model, but it's slower than I'd like.
+/*
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
     model.add(tf.layers.conv2d({filters: 12, kernelSize: 9, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 12, kernelSize: 8, strides: 1, activation: 'relu', padding: 'same'}))
@@ -38,16 +39,15 @@ function createModel(imageWidth, imageHeight) {
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 16, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
+*/
 
 // Trying a simpler model to see if it will work well enough and be faster.
-/*
     model.add(tf.layers.inputLayer({inputShape: [768, 1024, 3]}))
     model.add(tf.layers.conv2d({filters: 4, kernelSize: 6, strides: 1, activation: 'hardSigmoid', padding: 'same'}))
     model.add(tf.layers.conv2d({filters: 8, kernelSize: 3, strides: 1, activation: 'relu', padding: 'same'}))
     model.add(tf.layers.dense({activation: 'relu', units: 8, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'relu', units: 4, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
     model.add(tf.layers.dense({activation: 'tanh', units: 3, kernelInitializer: 'randomUniform', biasInitializer: 'randomUniform'}))
-*/
     return model
 }
 
